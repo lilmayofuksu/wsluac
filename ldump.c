@@ -11,6 +11,7 @@
 
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "lua.h"
 
@@ -80,7 +81,9 @@ static void DumpString (const TString *s, DumpState *D) {
       DumpByte(cast_int(size), D);
     else {
       DumpByte(0xFF, D);
-      DumpVar(size, D);
+      // genshin requires size_t=4; silently produces incorrect bytecode if len>=2^32
+      int32_t s = (int32_t)size;
+      DumpVar(s, D);
     }
     DumpVector(str, size - 1, D);  /* no need to save '\0' */
   }
